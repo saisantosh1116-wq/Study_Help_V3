@@ -341,7 +341,15 @@ const NexusDB = {
         return JSON.parse(localStorage.getItem('nexus_db'));
     },
     save(data) {
+        // 1. Save locally for instant lightning-fast UI updates
         localStorage.setItem('nexus_db', JSON.stringify(data));
+        
+        // 2. Silently push to the Cloud in the background
+        if (window.db && window.myVaultKey && window.setDoc && window.doc) {
+            window.setDoc(window.doc(window.db, "private_vaults", window.myVaultKey), {
+                nexus_db: data
+            }, { merge: true }).catch(e => console.error("Cloud sync failed:", e));
+        }
     },
     getDaysLeft(dateString) {
         const targetDate = new Date(dateString);
