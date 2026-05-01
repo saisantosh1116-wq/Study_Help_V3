@@ -790,7 +790,17 @@ function deleteTask(id, e) {
 
 function saveAndRender() {
     tasks.sort((a,b) => new Date(a.date) - new Date(b.date));
+    
+    // 1. Save locally
     localStorage.setItem('skTasks_v2', JSON.stringify(tasks));
+    
+    // 2. Push to Cloud
+    if (window.db && window.myVaultKey && window.setDoc && window.doc) {
+        window.setDoc(window.doc(window.db, "private_vaults", window.myVaultKey), {
+            terminal_tasks: tasks
+        }, { merge: true }).catch(e => console.error("Terminal cloud sync failed:", e));
+    }
+    
     renderTasks();
 }
 
