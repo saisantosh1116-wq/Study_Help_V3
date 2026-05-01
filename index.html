@@ -60,17 +60,58 @@
 <!-- Top Navigation -->
        <!-- Top Navigation -->
         <header class="top-nav">
-            <div class="logo">
-                <h1 class="nexus-brand">NEXUS</h1>
-                <span style="font-size: 0.9rem; color: #888;">S2 CSE Master</span>
-            </div>
-            <div class="controls">
-                <button onclick="window.linkDevice()" class="nexus-btn terminal-btn"> LINK DEVICE</button>
-                <button onclick="window.location.href='terminal.html'" class="nexus-btn terminal-btn">_> EASE of ACCESS</button>
-                <button id="theme-toggle" class="nexus-btn">Toggle Theme</button>
-             <!--   <button id="reset-btn" class="nexus-btn danger-btn">⚠️ Reset Data</button> -->
-            </div>
-        </header>
+    <div class="logo">
+        <h1 class="nexus-brand">NEXUS</h1>
+        <span style="font-size: 0.9rem; color: #888;">S2 CSE Master</span>
+    </div>
+    <div class="controls" id="cloud-controls">
+        <!-- Buttons injected dynamically by script below -->
+    </div>
+</header>
+
+<script>
+    function renderCloudUI() {
+        const container = document.getElementById('cloud-controls');
+        const key = localStorage.getItem('nexus_vault_key');
+        
+        let html = '';
+        
+        if (!key) {
+            // SHOW OPT-IN BUTTONS FOR NEW USERS
+            html += `
+                <button onclick="window.generateCloudVault()" class="nexus-btn accent-btn" style="border-color:var(--accent);">☁️ GO CLOUD</button>
+                <button onclick="window.linkDevice()" class="nexus-btn terminal-btn">[🔗] LINK DEVICE</button>
+            `;
+        } else {
+            // SHOW THE ACTIVE KEY FOR SYNCED USERS
+            html += `
+                <div style="font-family:monospace; color:var(--accent); font-size:0.75rem; border:1px solid var(--border); padding:8px 12px; border-radius:8px; background:rgba(0,240,255,0.05);">
+                    ACTIVE VAULT: <span style="font-weight:bold;">${key}</span>
+                </div>
+            `;
+        }
+
+        // STANDARD NAVIGATION BUTTONS
+        html += `
+            <button onclick="window.location.href='terminal.html'" class="nexus-btn terminal-btn">_> EASE of ACCESS</button>
+            <button id="theme-toggle" class="nexus-btn">Toggle Theme</button>
+        `;
+        
+        container.innerHTML = html;
+        
+        // Re-bind theme toggle since we just overwrote the HTML
+        const btn = document.getElementById('theme-toggle');
+        if(btn) btn.onclick = () => {
+            const current = document.documentElement.getAttribute('data-theme');
+            const target = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', target);
+            localStorage.setItem('nexus-theme', target);
+        };
+    }
+    
+    // Run UI build after core script has finished initializing
+    window.addEventListener('load', renderCloudUI);
+</script>
     <main class="page-container home-grid">
         <!-- Subjects Grid -->
         <section class="subjects-section" id="subject-grid-container">
