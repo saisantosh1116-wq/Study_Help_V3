@@ -90,38 +90,58 @@ window.gwGenerate = async function() {
 };
 
 // --- 3. REAL-TIME SYNC ENGINE ---
+// --- 3. REAL-TIME SYNC ENGINE (V5 STABILIZED) ---
 function startRealTimeSync() {
     if (!myVaultKey) return; 
 
     console.log("NEXUS: Real-time telemetry established.");
 
-    // WebSocket connection. Fires instantly on cloud changes.
-    onSnapshot(doc(db, "private_vaults", myVaultKey), (docSnap) => {
+    // includeMetadataChanges allows us to detect who triggered the sync
+    onSnapshot(doc(db, "private_vaults", myVaultKey), { includeMetadataChanges: true }, (docSnap) => {
+        
+        // 1. THE ECHO FILTER: Ignore data pushes that came from our own device
+        if (docSnap.metadata.hasPendingWrites) {
+            return; 
+        }
+
         if (docSnap.exists()) {
             const cloudData = docSnap.data();
+            
+            // 2. THE DEBOUNCER: Hard lock against runaway infinite loops
+            const lastSync = sessionStorage.getItem('nexus_cooldown');
+            const now = Date.now();
+            if (lastSync && (now - parseInt(lastSync)) < 3000) {
+                return; // Suppress any rapid-fire syncs under 3 seconds
+            }
+
             let changed = false;
             
-            // Compare Data safely
             if (cloudData.nexus_db) {
-                const cloudDbStr = JSON.stringify(cloudData.nexus_db);
-                if (localStorage.getItem('nexus_db') !== cloudDbStr) {
-                    localStorage.setItem('nexus_db', cloudDbStr);
+                const cloudStr = JSON.stringify(cloudData.nexus_db);
+                if (localStorage.getItem('nexus_db') !== cloudStr) {
+                    localStorage.setItem('nexus_db', cloudStr);
                     changed = true;
                 }
             }
             
             if (cloudData.terminal_tasks) {
-                const cloudTasksStr = JSON.stringify(cloudData.terminal_tasks);
-                if (localStorage.getItem('skTasks_v2') !== cloudTasksStr) {
-                    localStorage.setItem('skTasks_v2', cloudTasksStr);
+                const cloudStr = JSON.stringify(cloudData.terminal_tasks);
+                if (localStorage.getItem('skTasks_v2') !== cloudStr) {
+                    localStorage.setItem('skTasks_v2', cloudStr);
                     changed = true;
                 }
             }
             
-            // Auto-reload the UI without session locks, only if data genuinely changed
             if (changed) {
                 console.log("Incoming transmission... Updating UI.");
-                location.reload();
+                sessionStorage.setItem('nexus_cooldown', now.toString());
+                
+                // 3. THE SOFT-LOADER: Update the screen without flashing the browser tab
+                if (typeof window.renderDashboard === 'function') {
+                    window.renderDashboard(); 
+                } else {
+                    location.reload(); // Fallback for the terminal page
+                }
             }
         }
     });
