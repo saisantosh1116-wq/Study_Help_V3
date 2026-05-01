@@ -59,7 +59,7 @@ body {
     background-image: var(--bg-image);
     background-size: cover;
     background-position: center;
-    background-attachment: fixed; /* Keeps image static while scrolling */
+    background-attachment: fixed; 
     color: var(--text-primary);
     font-family: 'Inter', system-ui, sans-serif;
     transition: background-color 0.5s ease, background-image 0.5s ease, color 0.3s ease;
@@ -90,9 +90,9 @@ body {
 /* --- Top Navigation Alignment Fix --- */
 .controls {
     display: flex;
-    align-items: center; /* Vertically centers all buttons perfectly */
-    gap: 16px; /* Adds exact, even spacing between the buttons */
-    flex-wrap: nowrap; /* Prevents stacking on desktop */
+    align-items: center; 
+    gap: 16px; 
+    flex-wrap: nowrap; 
 }
 
 /* --- Buttons --- */
@@ -124,13 +124,12 @@ body {
 
 /* --- Sleek Terminal Button --- */
 .nexus-btn.terminal-btn {
-    font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace; /* Keeps the terminal vibe */
-    background: rgba(0, 240, 255, 0.03); /* Extremely subtle tint, not a solid block */
-    color: var(--accent); /* Inherits your global accent color safely */
-    border-color: rgba(0, 240, 255, 0.2); /* Soft border, matching the UI */
+    font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace; 
+    background: rgba(0, 240, 255, 0.03); 
+    color: var(--accent); 
+    border-color: rgba(0, 240, 255, 0.2); 
 }
 
-/* Enhances the glow only when the user interacts with it */
 .nexus-btn.terminal-btn:hover {
     background: rgba(0, 240, 255, 0.08);
     border-color: var(--accent);
@@ -146,7 +145,6 @@ body {
     box-shadow: var(--shadow);
     border-radius: 16px; 
     padding: 24px;
-    /* SICK 3D Animation on Hover */
     transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.4s ease, box-shadow 0.4s ease;
 }
 
@@ -156,7 +154,6 @@ body {
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255,255,255,0.6);
 }
 
-/* Ensure Dark Mode hover effects remain strictly Cyberpunk */
 [data-theme="dark"] .nexus-card:hover {
     box-shadow: 0 15px 50px rgba(0, 240, 255, 0.15);
 }
@@ -193,24 +190,12 @@ body {
     display: none;
 }   
 
-
-/* --- Mobile Optimizations (Project Nexus) --- */
-@media (max-width: 768px) {
-    body {
-        padding: 1rem;
-        align-items: flex-start; /* Allows scrolling from the top */
-    }
-
-    .app-container {
-        height: auto;
-        min-height: 95vh;
-        padding: 1rem;
-    }
-
-    /* Stack the Navigation */
+/* --- Mobile Navigation Optimizations --- */
+@media screen and (max-width: 800px) {
     .top-nav {
         flex-direction: column;
-        gap: 1rem;
+        gap: 15px;
+        padding: 15px;
         text-align: center;
     }
 
@@ -218,20 +203,11 @@ body {
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
-        gap: 10px;
+        gap: 8px;
+        width: 100%;
     }
-
-    /* Make buttons tap-friendly on mobile */
-    .btn, .nexus-btn {
-        width: 100%; 
-    }
-
-    /* Stack the Grid */
-    .dashboard-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .grid-cards {
-        grid-template-columns: 1fr;
+    
+    .nexus-btn {
+        width: 100%; /* Makes buttons full width on phones for easy tapping */
     }
 }
