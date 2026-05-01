@@ -211,3 +211,71 @@ body {
         width: 100%; /* Makes buttons full width on phones for easy tapping */
     }
 }
+/* ---HEEEEEELLLLOoooooooo */
+/* ========================================= */
+/* UNIVERSAL MOBILE PATCH (SECONDARY PAGES)  */
+/* ========================================= */
+
+@media screen and (max-width: 800px) {
+    /* 1. Force all top-level sections in page-containers to stack */
+    .page-container > div, 
+    .page-container > section {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        box-sizing: border-box;
+    }
+
+    /* 2. Neutralize any stray CSS Grids on sub-pages */
+    [style*="display: grid"], 
+    [style*="display:grid"] {
+        grid-template-columns: 1fr !important;
+        gap: 15px !important;
+    }
+
+    /* 3. Tame the Terminal Page (Prevents horizontal scrolling) */
+    .terminal-container,
+    .terminal-window,
+    pre, code {
+        width: 100% !important;
+        box-sizing: border-box;
+        white-space: pre-wrap !important; /* Forces long code to wrap */
+        word-wrap: break-word !important;
+        overflow-x: hidden !important;
+    }
+
+    /* 4. Tame any Tables (Allows sideways scrolling inside the table box) */
+    table {
+        display: block !important;
+        width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        border-collapse: collapse;
+    }
+
+    /* 5. Force all action rows/button groups to stack */
+    .action-row, 
+    .button-group,
+    [style*="display: flex"] {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        width: 100% !important;
+    }
+
+    .action-row > button, 
+    .button-group > button,
+    .action-row > input,
+    .button-group > input {
+        width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        margin-bottom: 10px;
+    }
+
+    /* 6. Prevent text blowout on long subject names/headings */
+    h1, h2, h3, h4, .subject-title {
+        word-wrap: break-word;
+        hyphens: auto;
+        max-width: 100%;
+    }
+}
