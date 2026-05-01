@@ -1,59 +1,62 @@
 /* layout.css */
-.page-container { max-width: 1400px; margin: 0 auto; padding: 0 40px 40px 40px; }
+.page-container { max-width: 1200px; margin: 0 auto; padding: 30px 40px; }
 
 /* Home Grid */
 .home-grid { display: grid; grid-template-columns: 2.5fr 1.5fr 1fr 1fr; gap: 24px; }
 .subjects-section { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.subject-card { display: flex; align-items: center; justify-content: center; text-align: center; padding: 40px 20px; text-decoration: none; color: var(--text-primary); font-weight: 600; font-size: 1.1rem; }
+.subject-card { display: flex; align-items: center; justify-content: center; text-align: center; padding: 30px 15px; text-decoration: none; color: var(--text-primary); font-weight: 600; font-size: 1rem; }
 
 .center-section { display: flex; flex-direction: column; gap: 24px; }
 .countdown-card { flex: 1.5; display: flex; flex-direction: column; align-items: center; justify-content: center;}
-.links-card { flex: 1; }
-
-.quick-links-list { list-style: none; padding: 0; margin: 0; }
-.quick-links-list li { margin-bottom: 12px; }
-.quick-links-list a { color: var(--text-secondary); text-decoration: none; font-weight: 600; transition: color 0.2s; }
-.quick-links-list a:hover { color: var(--accent); }
-
-.graph-card { text-align: center; }
-.global-review { grid-column: 1 / -1; }
-.global-review textarea { width: 100%; min-height: 100px; background: transparent; border: none; color: var(--text-primary); font-family: inherit; font-size: 1rem; resize: vertical; outline: none; }
-
+.global-review textarea { width: 100%; min-height: 100px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px; color: var(--text-primary); font-family: inherit; font-size: 0.95rem; resize: vertical; outline: none; margin-top: 10px; }
 .assignments-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
 /* ========================================= */
-/* MOBILE RESPONSIVE PROTOCOL                */
+/* MOBILE RESPONSIVE PROTOCOL (COMPACT)      */
 /* ========================================= */
 @media screen and (max-width: 800px) {
-    .page-container { padding: 0 15px 20px 15px; }
+    .page-container { padding: 20px 15px; }
     
-    /* 1. Stack the Main Dashboard Grid */
+    /* 1. Header & Controls Grid (Stops full-width bloat) */
+    .top-nav { flex-direction: column; gap: 15px; padding: 15px; text-align: center; border-bottom: none; }
+    #cloud-controls { display: grid !important; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
+    .nexus-btn { width: 100%; padding: 12px 8px; font-size: 0.85rem; }
+    
+    /* The Vault Key spans both columns */
+    #cloud-controls > div[title="Click to Copy"] { grid-column: 1 / -1; }
+    
+    /* 2. Main Dashboard Stack */
     .home-grid { display: flex !important; flex-direction: column !important; gap: 20px; }
     
-    /* 2. Fix the Countdown Card alignment */
-    .countdown-card { width: 100% !important; align-items: center !important; justify-content: center !important; padding: 30px 10px !important; }
+    /* 3. Subjects Grid (2 items per row instead of 1) */
+    .subjects-section { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+    .subject-card { padding: 20px 10px; font-size: 0.9rem; }
     
-    /* 3. Force inputs and buttons to stay inside cards */
-    .nexus-card div[style*="display: flex"] { flex-direction: column !important; width: 100% !important; gap: 10px !important; }
+    /* 4. Fix Inputs & Buttons alignment (Side-by-side, no stretching) */
+    .nexus-card div[style*="display: flex; gap: 5px;"] { 
+        display: flex !important; 
+        flex-direction: row !important; 
+        align-items: center !important;
+        width: 100% !important; 
+        gap: 8px !important; 
+    }
+    .nexus-input { margin-bottom: 0 !important; flex: 1; }
+    .nexus-btn.accent-btn[onclick*="addListItem"] { width: auto !important; min-width: 50px; }
     
-    /* 4. Fix To-Do/Checklist Input width and Button stretching */
-    .nexus-input { width: 100% !important; margin: 0 !important; }
-    .nexus-btn.accent-btn[onclick*="addListItem"] { width: 100% !important; padding: 12px !important; height: auto !important; }
+    /* 5. Fix Squished Headers (Assignments & Global Review) */
+    .nexus-card > div[style*="justify-content: space-between"] {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+    }
+
+    /* 6. Countdown Alignment */
+    .countdown-card { padding: 30px 10px !important; }
+    .countdown-card > div { width: 130px !important; height: 130px !important; margin: 0 auto !important; }
+    #global-countdown { font-size: 2.2rem !important; }
     
-    /* 5. Scale down the Countdown Ring properly */
-    .countdown-card > div { width: 140px !important; height: 140px !important; margin: 0 auto !important; }
-    #global-countdown { font-size: 2.5rem !important; }
-    
-    /* 6. Subjects Grid Fix */
-    .subjects-section { grid-template-columns: 1fr !important; }
-    
-    /* 7. Stack Assignments Grid */
-    .assignments-grid { grid-template-columns: 1fr; }
-    
-    /* 8. Fix the Gatekeeper System Lock Screen */
-    #nexus-gateway > div { padding: 30px 20px !important; width: 95% !important; }
-    
-    /* 9. Fix the Modals and Cards bleeding off screen */
-    .nexus-card { width: 100% !important; max-width: 100% !important; box-sizing: border-box; }
-    .modal-overlay .nexus-card { width: 95% !important; padding: 20px 15px; margin: 10px; }
+    /* 7. Modals */
+    .nexus-card { padding: 15px; }
+    .modal-overlay .nexus-card { width: 95% !important; padding: 20px; margin: 10px; }
 }
