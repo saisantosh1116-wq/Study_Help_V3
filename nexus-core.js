@@ -1,12 +1,9 @@
 // ==========================================
-// PROJECT NEXUS - CLOUD CORE ENGINE
+// PROJECT NEXUS - CLOUD CORE ENGINE (V2 STABLE)
 // ==========================================
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-
-// 1. FIREBASE CONFIGURATION
-
 
 const firebaseConfig = {
   apiKey: "AIzaSyCr-HdTaoK0esCrTvfle7jaP2d0J1tklMU",
@@ -17,91 +14,95 @@ const firebaseConfig = {
   appId: "1:781925379084:web:56723e3c12a086dad09229"
 };
 
-// 2. INITIALIZE CLOUD CONNECTION
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 console.log("NEXUS CORE: Firebase Online.");
 
-// 3. THE ANONYMOUS VAULT SYSTEM
 let myVaultKey = localStorage.getItem('nexus_vault_key');
 
-async function initializeVault() {
+// --- 1. STABILIZED SYNC ENGINE ---
+async function checkSync() {
     if (!myVaultKey) {
-        // A. Generate a new secure key
-        const randomStr = Math.random().toString(36).substring(2, 10).toUpperCase();
-        myVaultKey = "NEXUS-" + randomStr;
-        localStorage.setItem('nexus_vault_key', myVaultKey);
+        console.log("NEXUS: Running in Local-Only mode.");
+        return; 
+    }
+
+    // FEEDBACK LOOP PREVENTION: Check if we just refreshed from a sync
+    if (sessionStorage.getItem('nexus_sync_lock')) {
+        console.log("Sync lock active for this tab session.");
+        return;
+    }
+
+    try {
+        const docSnap = await getDoc(doc(db, "private_vaults", myVaultKey));
         
-        // B. Create the cloud vault AND upload their current local data so they lose nothing
-        await setDoc(doc(db, "private_vaults", myVaultKey), {
+        if (docSnap.exists()) {
+            const cloudData = docSnap.data();
+            let changed = false;
+            
+            // Sync Main Database
+            if (cloudData.nexus_db) {
+                const cloudDbStr = JSON.stringify(cloudData.nexus_db);
+                if (localStorage.getItem('nexus_db') !== cloudDbStr) {
+                    localStorage.setItem('nexus_db', cloudDbStr);
+                    changed = true;
+                }
+            }
+            
+            // Sync Terminal Tasks
+            if (cloudData.terminal_tasks) {
+                const cloudTasksStr = JSON.stringify(cloudData.terminal_tasks);
+                if (localStorage.getItem('skTasks_v2') !== cloudTasksStr) {
+                    localStorage.setItem('skTasks_v2', cloudTasksStr);
+                    changed = true;
+                }
+            }
+            
+            if (changed) {
+                console.log("New cloud data detected. Updating and locking...");
+                sessionStorage.setItem('nexus_sync_lock', 'true');
+                location.reload();
+            }
+        }
+    } catch (error) {
+        console.error("Cloud sync failed:", error);
+    }
+}
+
+// --- 2. OPT-IN VAULT GENERATION ---
+window.generateCloudVault = async function() {
+    if (confirm("Initialize Cloud Sync? This will back up your data and allow you to link other devices.")) {
+        const randomStr = Math.random().toString(36).substring(2, 10).toUpperCase();
+        const newKey = "NEXUS-" + randomStr;
+        
+        await setDoc(doc(db, "private_vaults", newKey), {
             nexus_db: JSON.parse(localStorage.getItem('nexus_db')) || {},
             terminal_tasks: JSON.parse(localStorage.getItem('skTasks_v2')) || [],
             createdAt: new Date().toISOString()
         });
-        
-        console.log("NEW VAULT CREATED: " + myVaultKey);
-        alert("SYSTEM NOTICE: Your secure cloud vault is ready.\n\nYour Key: " + myVaultKey + "\n\nSave this key to sync your phone or other devices.");
-    } else {
-        console.log("VAULT RECOGNIZED: " + myVaultKey);
-        
-        // C. The "Eventual Consistency" Sync Protocol (Cloud -> Local)
-        try {
-            const docSnap = await getDoc(doc(db, "private_vaults", myVaultKey));
-            
-            if (docSnap.exists()) {
-                const cloudData = docSnap.data();
-                let changed = false;
-                
-                // Compare and sync the Main Database (Syllabus, Resources, Subjects)
-                if (cloudData.nexus_db) {
-                    const cloudDbStr = JSON.stringify(cloudData.nexus_db);
-                    if (localStorage.getItem('nexus_db') !== cloudDbStr) {
-                        localStorage.setItem('nexus_db', cloudDbStr);
-                        changed = true;
-                    }
-                }
-                
-                // Compare and sync the Terminal Tasks
-                if (cloudData.terminal_tasks) {
-                    const cloudTasksStr = JSON.stringify(cloudData.terminal_tasks);
-                    if (localStorage.getItem('skTasks_v2') !== cloudTasksStr) {
-                        localStorage.setItem('skTasks_v2', cloudTasksStr);
-                        changed = true;
-                    }
-                }
-                
-                // If the Cloud had newer data, silently reboot the UI to show it
-                if (changed) {
-                    console.log("Cloud sync complete. Updating UI...");
-                    location.reload();
-                }
-            }
-        } catch (error) {
-            console.error("Failed to sync from cloud:", error);
-        }
-    }
-}
 
-// Boot up the vault system
-initializeVault();
-
-// 4. DEVICE LINKING PROTOCOL (Exposed to HTML)
-window.linkDevice = function() {
-    const existingKey = prompt("Enter your 12-character NEXUS Vault Key (e.g., NEXUS-A1B2C3D4):");
-    
-    if (existingKey && existingKey.startsWith("NEXUS-")) {
-        // Overwrite the local cache with the imported key
-        localStorage.setItem('nexus_vault_key', existingKey.trim().toUpperCase());
-        alert("DEVICE LINKED. Fetching cloud data...");
-        // Reload the page so initializeVault() runs with the new key and pulls down the data
+        localStorage.setItem('nexus_vault_key', newKey);
+        alert("CLOUD ONLINE. Your Master Key: " + newKey + "\n\nSave this key to link your phone!");
         location.reload();
-    } else {
-        alert("Invalid Key Format. Must start with NEXUS-");
     }
 };
 
-// 5. EXPOSE FIREBASE UTILITIES TO GLOBAL WINDOW
-// This allows your data.js and terminal.html files to push to the cloud
+// --- 3. LINKING PROTOCOL ---
+window.linkDevice = function() {
+    const existingKey = prompt("Enter your 12-character NEXUS Vault Key:");
+    if (existingKey && existingKey.startsWith("NEXUS-")) {
+        localStorage.setItem('nexus_vault_key', existingKey.trim().toUpperCase());
+        alert("VAULT LINKED. Fetching cloud data...");
+        location.reload();
+    } else {
+        alert("Invalid Key Format.");
+    }
+};
+
+// Initialize
+checkSync();
+
+// Global Utilities
 window.db = db;
 window.myVaultKey = myVaultKey;
 window.doc = doc;
