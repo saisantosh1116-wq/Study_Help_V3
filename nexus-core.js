@@ -1,9 +1,9 @@
 // ==========================================
-// PROJECT NEXUS - CLOUD CORE ENGINE (V4 REAL-TIME)
+// PROJECT NEXUS - CLOUD CORE ENGINE (MASTER)
 // ==========================================
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, onSnapshot, collection, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCr-HdTaoK0esCrTvfle7jaP2d0J1tklMU",
@@ -89,33 +89,28 @@ window.gwGenerate = async function() {
     }
 };
 
-// --- 3. REAL-TIME SYNC ENGINE ---
 // --- 3. REAL-TIME SYNC ENGINE (V5 STABILIZED) ---
 function startRealTimeSync() {
     if (!myVaultKey) return; 
 
     console.log("NEXUS: Real-time telemetry established.");
 
-    // includeMetadataChanges allows us to detect who triggered the sync
     onSnapshot(doc(db, "private_vaults", myVaultKey), { includeMetadataChanges: true }, (docSnap) => {
         
-        // 1. THE ECHO FILTER: Ignore data pushes that came from our own device
-        if (docSnap.metadata.hasPendingWrites) {
-            return; 
-        }
+        // ECHO FILTER: Ignore data pushes that came from our own device
+        if (docSnap.metadata.hasPendingWrites) return; 
 
         if (docSnap.exists()) {
             const cloudData = docSnap.data();
             
-            // 2. THE DEBOUNCER: Hard lock against runaway infinite loops
+            // THE DEBOUNCER: Hard lock against runaway infinite loops (3 seconds)
             const lastSync = sessionStorage.getItem('nexus_cooldown');
             const now = Date.now();
-            if (lastSync && (now - parseInt(lastSync)) < 3000) {
-                return; // Suppress any rapid-fire syncs under 3 seconds
-            }
+            if (lastSync && (now - parseInt(lastSync)) < 3000) return; 
 
             let changed = false;
             
+            // Compare Data safely
             if (cloudData.nexus_db) {
                 const cloudStr = JSON.stringify(cloudData.nexus_db);
                 if (localStorage.getItem('nexus_db') !== cloudStr) {
@@ -136,16 +131,101 @@ function startRealTimeSync() {
                 console.log("Incoming transmission... Updating UI.");
                 sessionStorage.setItem('nexus_cooldown', now.toString());
                 
-                // 3. THE SOFT-LOADER: Update the screen without flashing the browser tab
+                // THE SOFT-LOADER: Update the screen without flashing the browser tab
                 if (typeof window.renderDashboard === 'function') {
                     window.renderDashboard(); 
                 } else {
-                    location.reload(); // Fallback for the terminal page
+                    location.reload(); // Fallback for secondary pages
                 }
             }
         }
     });
 }
+
+// ==========================================
+// ADMIN PROTOCOLS (V2 - TARGETED INJECTION)
+// ==========================================
+
+window.NEXUS_ADMIN = {
+    // 1. Inject a specific assignment into a specific subject for all users
+    addAssignment: async function(title, subjectName, dueDateString) {
+        if (prompt("Admin Code:") !== "sudo-nexus") return console.error("Denied.");
+        
+        console.log(`INJECTING ASSIGNMENT: "${title}" into subject: ${subjectName}`);
+        
+        try {
+            const snapshot = await getDocs(collection(db, "private_vaults"));
+            let successCount = 0;
+
+            const updatePromises = snapshot.docs.map(async (userDoc) => {
+                let localDB = userDoc.data().nexus_db || {};
+                
+                if (!localDB.subjects) localDB.subjects = [];
+                if (!localDB.assignments) localDB.assignments = [];
+                
+                const targetSubject = localDB.subjects.find(s => s.name.toLowerCase().includes(subjectName.toLowerCase()));
+                
+                let assignedSubjectId = "none";
+                if (targetSubject) {
+                    assignedSubjectId = targetSubject.id;
+                } else {
+                     console.warn(`Vault ${userDoc.id}: Could not find subject matching "${subjectName}". Assigning to General.`);
+                }
+
+                localDB.assignments.push({
+                    id: 'a_admin_' + Date.now() + Math.random().toString(36).substring(2, 7),
+                    title: "[NEW] " + title,
+                    subjectId: assignedSubjectId,
+                    dueDate: dueDateString
+                });
+
+                await updateDoc(doc(db, "private_vaults", userDoc.id), { nexus_db: localDB });
+                successCount++;
+            });
+
+            await Promise.all(updatePromises);
+            alert(`Success. Injected assignment into ${successCount} vaults.`);
+            
+        } catch (e) { console.error("Injection failed:", e); }
+    },
+
+    // 2. Inject a Resource Link (PDF, Drive) into a specific subject's syllabus
+    addResource: async function(resourceTitle, linkUrl, subjectName) {
+        if (prompt("Admin Code:") !== "sudo-nexus") return console.error("Denied.");
+        
+        console.log(`INJECTING RESOURCE: "${resourceTitle}" into subject: ${subjectName}`);
+        
+        try {
+            const snapshot = await getDocs(collection(db, "private_vaults"));
+            let successCount = 0;
+
+            const updatePromises = snapshot.docs.map(async (userDoc) => {
+                let localDB = userDoc.data().nexus_db || {};
+                if (!localDB.subjects) localDB.subjects = [];
+                
+                const targetSubject = localDB.subjects.find(s => s.name.toLowerCase().includes(subjectName.toLowerCase()));
+                
+                if (targetSubject) {
+                    if (!targetSubject.resources) targetSubject.resources = [];
+                    
+                    targetSubject.resources.push({
+                        id: 'r_admin_' + Date.now(),
+                        title: resourceTitle,
+                        url: linkUrl,
+                        type: "link"
+                    });
+                    
+                    await updateDoc(doc(db, "private_vaults", userDoc.id), { nexus_db: localDB });
+                    successCount++;
+                }
+            });
+
+            await Promise.all(updatePromises);
+            alert(`Success. Injected resource into ${successCount} vaults that had the subject "${subjectName}".`);
+            
+        } catch (e) { console.error("Resource injection failed:", e); }
+    }
+};
 
 // Global Utilities
 window.db = db;
