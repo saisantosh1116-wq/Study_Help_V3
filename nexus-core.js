@@ -1,9 +1,9 @@
 // ==========================================
-// PROJECT NEXUS - CLOUD CORE ENGINE (V3 GATEKEEPER)
+// PROJECT NEXUS - CLOUD CORE ENGINE (V4 REAL-TIME)
 // ==========================================
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCr-HdTaoK0esCrTvfle7jaP2d0J1tklMU",
@@ -16,12 +16,11 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-console.log("NEXUS CORE: Firebase Online.");
+console.log("NEXUS CORE: Firebase Online. Real-time protocols standing by.");
 
 let myVaultKey = localStorage.getItem('nexus_vault_key');
 
 // --- 1. THE GATEKEEPER OVERLAY ---
-// If no key exists, halt the system and force a user decision.
 if (!myVaultKey) {
     window.addEventListener('DOMContentLoaded', () => {
         const gateway = document.createElement('div');
@@ -49,8 +48,8 @@ if (!myVaultKey) {
         document.body.appendChild(gateway);
     });
 } else {
-    // If a key exists, proceed with the standard sync engine
-    checkSync();
+    // Fire up the real-time sync engine immediately
+    startRealTimeSync();
 }
 
 // --- 2. GATEWAY ACTIONS ---
@@ -67,7 +66,6 @@ window.gwSubmit = function() {
 
 window.gwGenerate = async function() {
     if (confirm("INITIALIZE FRESH VAULT? This will secure your current progress to the cloud.")) {
-        // Change button text to show it's working
         document.getElementById('nexus-gateway').innerHTML = `<h3 style="color:#00f0ff; font-family:monospace; text-shadow: 0 0 10px #00f0ff;">INITIALIZING SECURE PROTOCOLS...</h3>`;
         
         const randomStr = Math.random().toString(36).substring(2, 10).toUpperCase();
@@ -91,20 +89,19 @@ window.gwGenerate = async function() {
     }
 };
 
-// --- 3. STABILIZED SYNC ENGINE ---
-async function checkSync() {
-    if (sessionStorage.getItem('nexus_sync_lock')) {
-        console.log("Sync lock active for this tab session.");
-        return;
-    }
+// --- 3. REAL-TIME SYNC ENGINE ---
+function startRealTimeSync() {
+    if (!myVaultKey) return; 
 
-    try {
-        const docSnap = await getDoc(doc(db, "private_vaults", myVaultKey));
-        
+    console.log("NEXUS: Real-time telemetry established.");
+
+    // WebSocket connection. Fires instantly on cloud changes.
+    onSnapshot(doc(db, "private_vaults", myVaultKey), (docSnap) => {
         if (docSnap.exists()) {
             const cloudData = docSnap.data();
             let changed = false;
             
+            // Compare Data safely
             if (cloudData.nexus_db) {
                 const cloudDbStr = JSON.stringify(cloudData.nexus_db);
                 if (localStorage.getItem('nexus_db') !== cloudDbStr) {
@@ -121,15 +118,13 @@ async function checkSync() {
                 }
             }
             
+            // Auto-reload the UI without session locks, only if data genuinely changed
             if (changed) {
-                console.log("New cloud data detected. Updating and locking...");
-                sessionStorage.setItem('nexus_sync_lock', 'true');
+                console.log("Incoming transmission... Updating UI.");
                 location.reload();
             }
         }
-    } catch (error) {
-        console.error("Cloud sync failed:", error);
-    }
+    });
 }
 
 // Global Utilities
