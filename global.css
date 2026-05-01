@@ -2,85 +2,67 @@
 .preload-theme, .preload-theme * { transition: none !important; }
 
 :root {
-    --bg-image: linear-gradient(rgba(148, 163, 184, 0.85), rgba(148, 163, 184, 0.85)), url('background.jpg'); 
-    --bg-base: #94a3b8; 
-    --surface: rgba(241, 245, 249, 0.85); 
-    --border: rgba(15, 23, 42, 0.15); 
-    --text-primary: #0f172a; 
-    --text-secondary: #334155; 
-    --accent: #1d4ed8; 
-    --danger: #dc2626;
-    --warning: #d97706;
-    --shadow: 0 8px 32px rgba(15, 23, 42, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.4);
-    --blur: blur(20px); 
-    --modal-overlay: rgba(148, 163, 184, 0.7); 
-    --input-bg: rgba(248, 250, 252, 0.7); 
+    /* LIGHT MODE: Pure Professional (Vercel/Apple-esque) */
+    --bg-base: #f8fafc; /* Crisp off-white background */
+    --surface: #ffffff; /* Pure white cards */
+    --border: #e2e8f0; /* Soft, clean borders */
+    --text-primary: #0f172a; /* Deep slate for high legibility */
+    --text-secondary: #64748b; 
+    --accent: #2563eb; /* Professional vibrant blue */
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    --blur: blur(10px); 
+    --modal-overlay: rgba(15, 23, 42, 0.4); 
+    --input-bg: #f1f5f9; 
+    --bg-image: none;
 }
 
 [data-theme="dark"] {
-    --bg-image: none; 
-    --bg-base: #09090b; 
-    --surface: rgba(15, 15, 18, 0.7); 
-    --border: rgba(0, 240, 255, 0.15); 
+    /* DARK MODE: True OLED / Cyberpunk */
+    --bg-base: #050505; /* Pitch black */
+    --surface: #111111; /* Slightly elevated dark cards */
+    --border: #222222; /* Very subtle borders */
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
-    --accent: #00f0ff; 
+    --accent: #00f0ff; /* Glowing Cyan */
     --danger: #ff003c;
     --warning: #ffb800;
-    --shadow: 0 8px 32px rgba(0, 240, 255, 0.05);
+    --shadow: 0 8px 32px rgba(0, 240, 255, 0.03);
     --blur: blur(20px);
     --modal-overlay: rgba(0, 0, 0, 0.8); 
-    --input-bg: rgba(255, 255, 255, 0.05); 
+    --input-bg: rgba(255, 255, 255, 0.03); 
 }
 
 body {
     background-color: var(--bg-base);
-    background-image: var(--bg-image);
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed; 
     color: var(--text-primary);
-    font-family: 'Inter', system-ui, sans-serif;
-    transition: background-color 0.5s ease, background-image 0.5s ease, color 0.3s ease;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
     margin: 0;
     padding: 0;
     min-height: 100vh;
 }
 
-.top-nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; }
-.nexus-brand { margin: 0; font-size: 1.5rem; letter-spacing: 2px; }
+/* --- Global Utilities & Navigation --- */
+.top-nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; border-bottom: 1px solid var(--border); background: var(--bg-base); }
+.nexus-brand { margin: 0; font-size: 1.5rem; letter-spacing: 1px; font-weight: 800; }
 .nexus-brand a { color: inherit; text-decoration: none; }
-.controls { display: flex; align-items: center; gap: 16px; flex-wrap: nowrap; }
+.controls { display: flex; align-items: center; gap: 12px; flex-wrap: nowrap; }
 
-.nexus-btn { background: var(--surface); color: var(--text-primary); border: 1px solid var(--border); padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: all 0.3s ease; }
-.nexus-btn:hover { border-color: var(--accent); box-shadow: var(--shadow); }
-.nexus-btn.accent-btn { border-color: var(--accent); color: var(--accent); }
-.nexus-btn.accent-btn:hover { background: var(--accent); color: var(--bg-base); }
-.nexus-btn.terminal-btn { font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace; background: rgba(0, 240, 255, 0.03); color: var(--accent); border-color: rgba(0, 240, 255, 0.2); }
-.nexus-btn.terminal-btn:hover { background: rgba(0, 240, 255, 0.08); border-color: var(--accent); box-shadow: 0 0 15px rgba(0, 240, 255, 0.15); }
+/* --- Buttons --- */
+.nexus-btn { background: var(--surface); color: var(--text-primary); border: 1px solid var(--border); padding: 10px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.2s ease; }
+.nexus-btn:hover { border-color: var(--accent); box-shadow: var(--shadow); transform: translateY(-1px); }
+.nexus-btn.accent-btn { background: var(--accent); color: #ffffff; border: none; }
+.nexus-btn.accent-btn:hover { opacity: 0.9; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
+[data-theme="dark"] .nexus-btn.accent-btn { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+[data-theme="dark"] .nexus-btn.accent-btn:hover { background: rgba(0, 240, 255, 0.1); box-shadow: 0 0 15px rgba(0, 240, 255, 0.15); }
 
-.nexus-card { background: var(--surface); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur); border: 1px solid var(--border); box-shadow: var(--shadow); border-radius: 16px; padding: 24px; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.4s ease, box-shadow 0.4s ease; }
-.nexus-card:hover { border-color: var(--accent); transform: translateY(-6px); box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255,255,255,0.6); }
-[data-theme="dark"] .nexus-card:hover { box-shadow: 0 15px 50px rgba(0, 240, 255, 0.15); }
+/* --- The Glass Engine (Cards) --- */
+.nexus-card { background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); border-radius: 12px; padding: 24px; transition: border-color 0.3s ease, box-shadow 0.3s ease; }
+.nexus-card:hover { border-color: var(--accent); }
 
-.nexus-input { width: 100%; padding: 12px; margin-bottom: 15px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text-primary); border-radius: 6px; box-sizing: border-box; font-family: inherit; transition: border-color 0.2s ease, box-shadow 0.2s ease; }
-.nexus-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 10px rgba(37, 99, 235, 0.1); }
-
-.modal-overlay { position: fixed; inset: 0; background: var(--modal-overlay); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 1000; align-items: center; justify-content: center; display: none; }
-
-/* ========================================= */
-/* UNIVERSAL MOBILE PATCH                    */
-/* ========================================= */
-@media screen and (max-width: 800px) {
-    .top-nav { flex-direction: column; gap: 15px; padding: 15px; text-align: center; }
-    .controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; width: 100%; }
-    .nexus-btn { width: 100%; }
-    
-    .page-container > div, .page-container > section { display: flex !important; flex-direction: column !important; width: 100% !important; box-sizing: border-box; }
-    [style*="display: grid"], [style*="display:grid"] { grid-template-columns: 1fr !important; gap: 15px !important; }
-    .terminal-container, .terminal-window, pre, code { width: 100% !important; box-sizing: border-box; white-space: pre-wrap !important; word-wrap: break-word !important; overflow-x: hidden !important; }
-    table { display: block !important; width: 100% !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch; border-collapse: collapse; }
-    .action-row, .button-group, [style*="display: flex"] { flex-direction: column !important; align-items: stretch !important; width: 100% !important; }
-    .action-row > button, .button-group > button, .action-row > input, .button-group > input { width: 100% !important; margin-left: 0 !important; margin-right: 0 !important; margin-bottom: 10px; }
-    h1, h2, h3, h4, .subject-title { word-wrap: break-word; hyphens: auto; max-width: 100%; }
-}
+/* --- Forms & Modals --- */
+.nexus-input { width: 100%; padding: 12px; margin-bottom: 15px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text-primary); border-radius: 8px; box-sizing: border-box; font-family: inherit; font-size: 0.95rem; transition: border-color 0.2s ease; }
+.nexus-input:focus { outline: none; border-color: var(--accent); }
+.modal-overlay { position: fixed; inset: 0; background: var(--modal-overlay); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur); z-index: 1000; align-items: center; justify-content: center; display: none; }
