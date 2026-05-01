@@ -1,43 +1,24 @@
 /* --- global.css --- */
-/* Placed at the very top of global.css */
-.preload-theme, .preload-theme * {
-    transition: none !important;
-}
+.preload-theme, .preload-theme * { transition: none !important; }
 
 :root {
-    /* LIGHT MODE: "E-Ink / Soft Paper" (Anti-Flashbang) */
-    
-    /* 1. The Wash: Heavy, muted gray-blue to absorb the monitor backlight glare */
     --bg-image: linear-gradient(rgba(148, 163, 184, 0.85), rgba(148, 163, 184, 0.85)), url('background.jpg'); 
     --bg-base: #94a3b8; 
-    
-    /* 2. The Glass: Soft off-white (Slate 100) instead of pure white. */
     --surface: rgba(241, 245, 249, 0.85); 
-    
-    /* 3. The Edges: Slightly darker border for contrast without harshness */
     --border: rgba(15, 23, 42, 0.15); 
-    
-    /* Deep, highly legible text */
     --text-primary: #0f172a; 
     --text-secondary: #334155; 
-    
-    /* Accents - Darkened slightly for perfect contrast on the soft paper background */
     --accent: #1d4ed8; 
     --danger: #dc2626;
     --warning: #d97706;
-    
-    /* 4. The Depth: Neutral shadows to anchor the floating cards */
     --shadow: 0 8px 32px rgba(15, 23, 42, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.4);
     --blur: blur(20px); 
-
-    /* Overlays & Inputs */
     --modal-overlay: rgba(148, 163, 184, 0.7); 
     --input-bg: rgba(248, 250, 252, 0.7); 
 }
 
 [data-theme="dark"] {
-    /* DARK MODE: Sleek Knight / Cyberpunk */
-    --bg-image: none; /* Ensures the image disappears in Dark Mode */
+    --bg-image: none; 
     --bg-base: #09090b; 
     --surface: rgba(15, 15, 18, 0.7); 
     --border: rgba(0, 240, 255, 0.15); 
@@ -48,10 +29,8 @@
     --warning: #ffb800;
     --shadow: 0 8px 32px rgba(0, 240, 255, 0.05);
     --blur: blur(20px);
-
-    /* Dynamic Overlays & Inputs for Contrast */
-    --modal-overlay: rgba(0, 0, 0, 0.8); /* Pitch black overlay */
-    --input-bg: rgba(255, 255, 255, 0.05); /* Sheer dark input */
+    --modal-overlay: rgba(0, 0, 0, 0.8); 
+    --input-bg: rgba(255, 255, 255, 0.05); 
 }
 
 body {
@@ -68,214 +47,40 @@ body {
     min-height: 100vh;
 }
 
-/* --- Global Utilities & Navigation --- */
-.top-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 40px;
-}
+.top-nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; }
+.nexus-brand { margin: 0; font-size: 1.5rem; letter-spacing: 2px; }
+.nexus-brand a { color: inherit; text-decoration: none; }
+.controls { display: flex; align-items: center; gap: 16px; flex-wrap: nowrap; }
 
-.nexus-brand { 
-    margin: 0; 
-    font-size: 1.5rem; 
-    letter-spacing: 2px; 
-}
+.nexus-btn { background: var(--surface); color: var(--text-primary); border: 1px solid var(--border); padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: all 0.3s ease; }
+.nexus-btn:hover { border-color: var(--accent); box-shadow: var(--shadow); }
+.nexus-btn.accent-btn { border-color: var(--accent); color: var(--accent); }
+.nexus-btn.accent-btn:hover { background: var(--accent); color: var(--bg-base); }
+.nexus-btn.terminal-btn { font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace; background: rgba(0, 240, 255, 0.03); color: var(--accent); border-color: rgba(0, 240, 255, 0.2); }
+.nexus-btn.terminal-btn:hover { background: rgba(0, 240, 255, 0.08); border-color: var(--accent); box-shadow: 0 0 15px rgba(0, 240, 255, 0.15); }
 
-.nexus-brand a { 
-    color: inherit; 
-    text-decoration: none; 
-}
+.nexus-card { background: var(--surface); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur); border: 1px solid var(--border); box-shadow: var(--shadow); border-radius: 16px; padding: 24px; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.4s ease, box-shadow 0.4s ease; }
+.nexus-card:hover { border-color: var(--accent); transform: translateY(-6px); box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255,255,255,0.6); }
+[data-theme="dark"] .nexus-card:hover { box-shadow: 0 15px 50px rgba(0, 240, 255, 0.15); }
 
-/* --- Top Navigation Alignment Fix --- */
-.controls {
-    display: flex;
-    align-items: center; 
-    gap: 16px; 
-    flex-wrap: nowrap; 
-}
+.nexus-input { width: 100%; padding: 12px; margin-bottom: 15px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text-primary); border-radius: 6px; box-sizing: border-box; font-family: inherit; transition: border-color 0.2s ease, box-shadow 0.2s ease; }
+.nexus-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 10px rgba(37, 99, 235, 0.1); }
 
-/* --- Buttons --- */
-.nexus-btn {
-    background: var(--surface);
-    color: var(--text-primary);
-    border: 1px solid var(--border);
-    padding: 10px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all 0.3s ease;
-}
+.modal-overlay { position: fixed; inset: 0; background: var(--modal-overlay); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 1000; align-items: center; justify-content: center; display: none; }
 
-.nexus-btn:hover { 
-    border-color: var(--accent); 
-    box-shadow: var(--shadow); 
-}
-
-.nexus-btn.accent-btn { 
-    border-color: var(--accent); 
-    color: var(--accent); 
-}
-
-.nexus-btn.accent-btn:hover { 
-    background: var(--accent); 
-    color: var(--bg-base); 
-}
-
-/* --- Sleek Terminal Button --- */
-.nexus-btn.terminal-btn {
-    font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace; 
-    background: rgba(0, 240, 255, 0.03); 
-    color: var(--accent); 
-    border-color: rgba(0, 240, 255, 0.2); 
-}
-
-.nexus-btn.terminal-btn:hover {
-    background: rgba(0, 240, 255, 0.08);
-    border-color: var(--accent);
-    box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
-}
-
-/* --- The Glass Engine (Cards) --- */
-.nexus-card {
-    background: var(--surface);
-    backdrop-filter: var(--blur);
-    -webkit-backdrop-filter: var(--blur);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow);
-    border-radius: 16px; 
-    padding: 24px;
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.4s ease, box-shadow 0.4s ease;
-}
-
-.nexus-card:hover { 
-    border-color: var(--accent); 
-    transform: translateY(-6px); 
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255,255,255,0.6);
-}
-
-[data-theme="dark"] .nexus-card:hover {
-    box-shadow: 0 15px 50px rgba(0, 240, 255, 0.15);
-}
-
-/* --- Forms & Modals --- */
-.nexus-input {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 15px;
-    background: var(--input-bg);
-    border: 1px solid var(--border);
-    color: var(--text-primary);
-    border-radius: 6px;
-    box-sizing: border-box;
-    font-family: inherit;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.nexus-input:focus { 
-    outline: none; 
-    border-color: var(--accent); 
-    box-shadow: 0 0 10px rgba(37, 99, 235, 0.1);
-}
-
-.modal-overlay {
-    position: fixed; 
-    inset: 0; 
-    background: var(--modal-overlay);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    z-index: 1000; 
-    align-items: center; 
-    justify-content: center; 
-    display: none;
-}   
-
-/* --- Mobile Navigation Optimizations --- */
+/* ========================================= */
+/* UNIVERSAL MOBILE PATCH                    */
+/* ========================================= */
 @media screen and (max-width: 800px) {
-    .top-nav {
-        flex-direction: column;
-        gap: 15px;
-        padding: 15px;
-        text-align: center;
-    }
-
-    .controls {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 8px;
-        width: 100%;
-    }
+    .top-nav { flex-direction: column; gap: 15px; padding: 15px; text-align: center; }
+    .controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; width: 100%; }
+    .nexus-btn { width: 100%; }
     
-    .nexus-btn {
-        width: 100%; /* Makes buttons full width on phones for easy tapping */
-    }
-}
-/* ---HEEEEEELLLLOoooooooo */
-/* ========================================= */
-/* UNIVERSAL MOBILE PATCH (SECONDARY PAGES)  */
-/* ========================================= */
-
-@media screen and (max-width: 800px) {
-    /* 1. Force all top-level sections in page-containers to stack */
-    .page-container > div, 
-    .page-container > section {
-        display: flex !important;
-        flex-direction: column !important;
-        width: 100% !important;
-        box-sizing: border-box;
-    }
-
-    /* 2. Neutralize any stray CSS Grids on sub-pages */
-    [style*="display: grid"], 
-    [style*="display:grid"] {
-        grid-template-columns: 1fr !important;
-        gap: 15px !important;
-    }
-
-    /* 3. Tame the Terminal Page (Prevents horizontal scrolling) */
-    .terminal-container,
-    .terminal-window,
-    pre, code {
-        width: 100% !important;
-        box-sizing: border-box;
-        white-space: pre-wrap !important; /* Forces long code to wrap */
-        word-wrap: break-word !important;
-        overflow-x: hidden !important;
-    }
-
-    /* 4. Tame any Tables (Allows sideways scrolling inside the table box) */
-    table {
-        display: block !important;
-        width: 100% !important;
-        overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch;
-        border-collapse: collapse;
-    }
-
-    /* 5. Force all action rows/button groups to stack */
-    .action-row, 
-    .button-group,
-    [style*="display: flex"] {
-        flex-direction: column !important;
-        align-items: stretch !important;
-        width: 100% !important;
-    }
-
-    .action-row > button, 
-    .button-group > button,
-    .action-row > input,
-    .button-group > input {
-        width: 100% !important;
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-        margin-bottom: 10px;
-    }
-
-    /* 6. Prevent text blowout on long subject names/headings */
-    h1, h2, h3, h4, .subject-title {
-        word-wrap: break-word;
-        hyphens: auto;
-        max-width: 100%;
-    }
+    .page-container > div, .page-container > section { display: flex !important; flex-direction: column !important; width: 100% !important; box-sizing: border-box; }
+    [style*="display: grid"], [style*="display:grid"] { grid-template-columns: 1fr !important; gap: 15px !important; }
+    .terminal-container, .terminal-window, pre, code { width: 100% !important; box-sizing: border-box; white-space: pre-wrap !important; word-wrap: break-word !important; overflow-x: hidden !important; }
+    table { display: block !important; width: 100% !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch; border-collapse: collapse; }
+    .action-row, .button-group, [style*="display: flex"] { flex-direction: column !important; align-items: stretch !important; width: 100% !important; }
+    .action-row > button, .button-group > button, .action-row > input, .button-group > input { width: 100% !important; margin-left: 0 !important; margin-right: 0 !important; margin-bottom: 10px; }
+    h1, h2, h3, h4, .subject-title { word-wrap: break-word; hyphens: auto; max-width: 100%; }
 }
