@@ -44,3 +44,65 @@
 
 /* Assignments Grid */
 .assignments-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+/* ========================================= */
+/* MOBILE RESPONSIVE PROTOCOL                */
+/* ========================================= */
+
+@media screen and (max-width: 800px) {
+    .page-container {
+        padding: 0 15px 20px 15px;
+    }
+
+    /* 1. Stack the Main Dashboard Grid */
+    .home-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 20px;
+    }
+
+    /* Stack Subjects */
+    .subjects-section {
+        grid-template-columns: 1fr;
+    }
+
+    /* 2. Fix the Modals and Cards bleeding off screen */
+    .nexus-card {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box;
+    }
+
+    .modal-overlay .nexus-card {
+        width: 95% !important;
+        padding: 20px 15px;
+        margin: 10px;
+    }
+
+    /* 3. Fix Inputs and Select dropdowns */
+    .nexus-input {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* 4. Scale down the Countdown Ring */
+    .countdown-card > div {
+        width: 120px !important;
+        height: 120px !important;
+    }
+    
+    #global-countdown {
+        font-size: 2rem !important;
+    }
+
+    /* 5. Fix the Gatekeeper System Lock Screen */
+    #nexus-gateway > div {
+        padding: 30px 20px !important;
+        width: 95% !important;
+    }
+    
+    /* 6. Stack Assignments Grid */
+    .assignments-grid {
+        grid-template-columns: 1fr;
+    }
+}
