@@ -98,36 +98,51 @@ window.gwGenerate = async function() {
 };
 
 // --- 3. REAL-TIME SYNC ENGINE ---
+// --- 3. REAL-TIME SYNC ENGINE (V5.1 HOTFIX) ---
 function startRealTimeSync() {
     if (!myVaultKey) return; 
+
+    console.log("NEXUS: Real-time telemetry established. Awaiting transmissions.");
 
     // WebSocket connection. Fires instantly on cloud changes.
     onSnapshot(doc(db, "private_vaults", myVaultKey), (docSnap) => {
         if (docSnap.exists()) {
             const cloudData = docSnap.data();
-            let changed = false;
+            let requiresUpdate = false;
             
-            // Compare Data safely
-            if (cloudData.nexus_db) {
-                const cloudDbStr = JSON.stringify(cloudData.nexus_db);
-                if (localStorage.getItem('nexus_db') !== cloudDbStr) {
-                    localStorage.setItem('nexus_db', cloudDbStr);
-                    changed = true;
-                }
+            // 1. Safely parse the incoming cloud strings
+            const cloudDbStr = cloudData.nexus_db ? JSON.stringify(cloudData.nexus_db) : "{}";
+            const cloudTasksStr = cloudData.terminal_tasks ? JSON.stringify(cloudData.terminal_tasks) : "[]";
+            
+            // 2. Compare against local cache
+            if (localStorage.getItem('nexus_db') !== cloudDbStr) {
+                localStorage.setItem('nexus_db', cloudDbStr);
+                requiresUpdate = true;
             }
             
-            if (cloudData.terminal_tasks) {
-                const cloudTasksStr = JSON.stringify(cloudData.terminal_tasks);
-                if (localStorage.getItem('skTasks_v2') !== cloudTasksStr) {
-                    localStorage.setItem('skTasks_v2', cloudTasksStr);
-                    changed = true;
-                }
+            if (localStorage.getItem('skTasks_v2') !== cloudTasksStr) {
+                localStorage.setItem('skTasks_v2', cloudTasksStr);
+                requiresUpdate = true;
             }
             
-            // Auto-reload the UI without session locks, only if data genuinely changed
-            if (changed) {
-                console.log("Incoming transmission... Updating UI.");
-                location.reload();
+            // 3. THE FIX: Dynamically re-render the UI instead of reloading the page
+            if (requiresUpdate) {
+                console.log("Transmission received. Hot-swapping UI data...");
+                
+                // Check if we are on the main dashboard page and the render function exists
+                if (typeof window.renderDashboard === 'function') {
+                    // Update the underlying variables used by your index.html script
+                    if (typeof window.patchDatabase === 'function') window.patchDatabase();
+                    window.renderDashboard();
+                } else {
+                    // Fallback for sub-pages (like terminal.html or assignments.html)
+                    // Only reload if we absolutely have to, and set a brief lockout to prevent loops
+                    if (!sessionStorage.getItem('sync_lockout')) {
+                        sessionStorage.setItem('sync_lockout', 'true');
+                        setTimeout(() => sessionStorage.removeItem('sync_lockout'), 2000);
+                        location.reload();
+                    }
+                }
             }
         }
     });
